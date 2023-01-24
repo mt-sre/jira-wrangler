@@ -1,0 +1,8 @@
+title: LP SRE Weekly Status Update
+reports:
+- title: APAC
+  label: mtsre+cssre-apac
+- title: EMEA
+  label: mtsre+cssre-emea
+- title: NASA
+  label: mtsre+cssre-nasa
