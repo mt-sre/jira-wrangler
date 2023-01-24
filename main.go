@@ -108,16 +108,17 @@ func generateReport(ctx context.Context, config ReportConfig, client *jira.Clien
 func printIssue(issue *jira.Issue) {
 	fmt.Printf("- [%s] %s\n", issue.Key, issue.Fields.Summary)
 	fmt.Printf("  Status:\t %s\n", issue.Fields.Status.Name)
-	color := getColor(issue)
-	if len(color) > 0 {
-		fmt.Printf("  Color:\t %s\n", getColor(issue))
+
+	if priority := getPriority(issue); len(priority) > 0 {
+		fmt.Printf("  Priority:\t %s\n", priority)
 	}
-	targedEnd := getCustomField(issue, targetEndDateCustomFieldID)
-	if len(targedEnd) > 0 {
-		fmt.Printf("  Target end:\t %s\n", getCustomField(issue, targetEndDateCustomFieldID))
+	if color := getColor(issue); len(color) > 0 {
+		fmt.Printf("  Color:\t %s\n", color)
 	}
-	comment := statusComment(issue)
-	if len(comment) > 0 {
+	if targedEnd := getCustomField(issue, targetEndDateCustomFieldID); len(targedEnd) > 0 {
+		fmt.Printf("  Target end:\t %s\n", targedEnd)
+	}
+	if comment := statusComment(issue); len(comment) > 0 {
 		fmt.Printf("  Comment:\t %s\n", comment)
 	}
 }
@@ -132,6 +133,16 @@ func getColor(issue *jira.Issue) string {
 		return ""
 	}
 	return c
+}
+
+func getPriority(issue *jira.Issue) string {
+	if issue.Fields.Priority == nil {
+		return ""
+	}
+	if issue.Fields.Priority.Name == "Undefined" {
+		return ""
+	}
+	return issue.Fields.Priority.Name
 }
 
 func getCustomField(issue *jira.Issue, customFieldID string) string {
