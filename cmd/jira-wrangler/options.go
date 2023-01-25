@@ -5,9 +5,10 @@ import (
 )
 
 type Options struct {
-	JiraToken  string
-	JiraURL    string
-	ConfigPath string
+	JiraToken             string
+	JiraURL               string
+	ConfigPath            string
+	OverrideTemplatesPath string
 }
 
 func (o *Options) AddFlags(flags *pflag.FlagSet) {
@@ -28,5 +29,11 @@ func (o *Options) AddFlags(flags *pflag.FlagSet) {
 		"config-file",
 		o.ConfigPath,
 		"Config file location",
+	)
+	flags.StringVar(
+		&o.OverrideTemplatesPath,
+		"override-templates-path",
+		o.OverrideTemplatesPath,
+		"Path to override templates",
 	)
 }

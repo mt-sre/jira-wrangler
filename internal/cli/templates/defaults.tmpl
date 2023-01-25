@@ -1,0 +1,32 @@
+{{ define "report" -}}
+{{ .Title }}
+Week {{ .WeekOfYear }} - {{ .Now }}
+
+{{ range .Groups -}}
+{{ template "group" . }}
+{{- end }}
+{{- end }}
+
+{{ define "group" -}}
+{{ .Title }}
+{{ template "issue-list" .Issues }}
+{{- end }}
+
+{{ define "issue-list" -}}
+{{ range . -}}
+- [{{ .Key }}] {{ .Summary }}
+  Status:{{ "\t" }}{{ .Status -}}
+{{ if ne .Priority "" }}
+  Priority:{{ "\t" }}{{ .Priority -}}
+{{ end -}}
+{{ if ne .Color "" }}
+  Color:{{ "\t" }}{{ .Color -}}
+{{ end -}}
+{{ if ne .TargetEnd "" }}
+  TargetEnd:{{ "\t" }}{{ .TargetEnd -}}
+{{ end -}}
+{{ if ne .StatusComment "" }}
+  Comment:{{ "\t" }}{{ .StatusComment -}}
+{{ end }}
+{{ end -}}
+{{ end }}

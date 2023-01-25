@@ -97,11 +97,8 @@ func colorFromRaw(raw jira.Issue) Color {
 	if colorFieldMap, ok := colorField.(map[string]interface{}); ok {
 		c = colorFieldMap["value"].(string)
 	}
-	if c == "Not Selected" {
-		return ColorNone
-	}
 
-	return Color(c)
+	return ParseColor(c)
 }
 
 func customStringFieldFromRaw(raw jira.Issue, customFieldID string) string {
@@ -129,10 +126,27 @@ func statusCommentFromRaw(issue jira.Issue) string {
 	return strings.ReplaceAll(latestReportComment, "\r", "")
 }
 
+func ParseColor(raw string) Color {
+	switch strings.ToLower(raw) {
+	case "red":
+		return ColorRed
+	case "yellow":
+		return ColorYellow
+	case "green":
+		return ColorGreen
+	default:
+		return ColorNone
+	}
+}
+
 type Color string
 
 func (c Color) String() string {
 	return string(c)
+}
+
+func (c Color) Less(other Color) bool {
+	return _colorOrd[c] < _colorOrd[other]
 }
 
 const (
@@ -141,6 +155,13 @@ const (
 	ColorYellow Color = "Yellow"
 	ColorGreen  Color = "Green"
 )
+
+var _colorOrd = map[Color]int{
+	ColorNone:   0,
+	ColorRed:    1,
+	ColorYellow: 2,
+	ColorGreen:  3,
+}
 
 type ClientConfig struct {
 	BaseURL string
