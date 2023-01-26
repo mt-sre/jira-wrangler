@@ -88,7 +88,7 @@ type JiraClient interface {
 
 func getIssuesGroupedByColor(ctx context.Context, label string, client JiraClient) ([]jirainternal.Issue, error) {
 	jql := fmt.Sprintf(
-		`project = "SDE" AND labels = %q AND Status in ("To Do","In Progress") ORDER BY priority DESC`,
+		`project = "SDE" AND labels = %q AND Status in ("New","To Do","In Progress") ORDER BY priority DESC`,
 		label,
 	)
 	issues, err := client.SearchIssues(ctx, jql)
