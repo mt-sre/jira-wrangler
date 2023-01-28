@@ -1,6 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/spf13/pflag"
 )
 
@@ -9,6 +13,7 @@ type Options struct {
 	JiraURL               string
 	ConfigPath            string
 	OverrideTemplatesPath string
+	SecretsPath           string
 }
 
 func (o *Options) AddFlags(flags *pflag.FlagSet) {
@@ -36,4 +41,41 @@ func (o *Options) AddFlags(flags *pflag.FlagSet) {
 		o.OverrideTemplatesPath,
 		"Path to override templates",
 	)
+	flags.StringVar(
+		&o.SecretsPath,
+		"secrets-path",
+		o.SecretsPath,
+		"Path to directory containing secrets",
+	)
+}
+
+func (o *Options) LoadSecrets() error {
+	if o.JiraURL == "" {
+		url, err := loadFromFile(filepath.Join(o.SecretsPath, "jira-url"))
+		if err != nil {
+			return fmt.Errorf("loading 'jira-url' from file: %w", err)
+		}
+
+		o.JiraURL = url
+	}
+
+	if o.JiraToken == "" {
+		token, err := loadFromFile(filepath.Join(o.SecretsPath, "jira-token"))
+		if err != nil {
+			return fmt.Errorf("loading 'jira-token' from file: %w", err)
+		}
+
+		o.JiraToken = token
+	}
+
+	return nil
+}
+
+func loadFromFile(path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("reading file %q: %w", path, err)
+	}
+
+	return string(data), nil
 }
