@@ -1,0 +1,17 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: /
+  schedule:
+    interval: daily
+  labels:
+  - kind/deps
+  commit-message:
+    prefix: fix
+    include: scope
+- package-ecosystem: "docker"
+  directory: "/"
+  schedule:
+    interval: "daily"
+  labels:
+  - kind/deps
