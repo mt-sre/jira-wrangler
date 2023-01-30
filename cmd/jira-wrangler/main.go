@@ -25,6 +25,10 @@ func main() {
 			ctx, cancel := context.WithCancel(cmd.Root().Context())
 			defer cancel()
 
+			if err := opts.LoadSecrets(); err != nil {
+				fmt.Fprintf(os.Stderr, "loading secrets from %q: %v", opts.SecretsPath, err)
+			}
+
 			tp := jira.BearerAuthTransport{
 				Token: opts.JiraToken,
 			}

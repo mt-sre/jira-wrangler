@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: jira-wrangler
+spec:
+  schedule: "01 06 * * 4"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: jira-wrangler
+            image: jira-wrangler
+            imagePullPolicy: IfNotPresent
+            args:
+            - --config-file=/app/config/config.yaml
+            - --secrets-path=/app/config
+            volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            securityContext:
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+            resources:
+              requests:
+                memory: 32Mi
+                cpu: 50m
+              limits:
+                memory: 64Mi
+                cpu: 100m
+          restartPolicy: OnFailure
+          volumes:
+          - name: config
+            projected:
+              sources:
+              - configMap:
+                  name: jira-wrangler
+              - secret:
+                  name: jira-wrangler
+                  optional: false
