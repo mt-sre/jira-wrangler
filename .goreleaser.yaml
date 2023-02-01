@@ -1,0 +1,46 @@
+project_name: jira-wrangler
+before:
+  hooks:
+  - go mod tidy
+  - go mod verify
+builds:
+- env:
+  - CGO_ENABLED=0
+  goos:
+  - linux
+  - darwin
+  - windows
+  main: ./cmd/jira-wrangler
+  binary: jira-wrangler
+archives:
+- format_overrides:
+  - goos: windows
+    format: zip
+dockers:
+- image_templates:
+  - "{{ .Env.IMAGE_REGISTRY }}/{{ .Env.IMAGE_ORG }}/{{ .ProjectName }}:latest"
+  - "{{ .Env.IMAGE_REGISTRY }}/{{ .Env.IMAGE_ORG }}/{{ .ProjectName }}:{{ .Tag }}"
+  - "{{ .Env.IMAGE_REGISTRY }}/{{ .Env.IMAGE_ORG }}/{{ .ProjectName }}:{{ .Tag }}-{{ .ShortCommit }}"
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  use: github
+  groups:
+  - title: Breaking
+    regexp: "^.*(fix|feat)[(\\w)]*!:+.*$"
+    order: 0
+  - title: Changes
+    regexp: "^.*feat[(\\w)]*:+.*$"
+    order: 10
+  - title: Bugfixes
+    regexp: "^.*fix[(\\w)]*:+.*$"
+    order: 20
+  - title: Trivial
+    order: 999
+  filters:
+    exclude:
+    - Merge pull request
+    - '^docs:'
+    - '^test:'

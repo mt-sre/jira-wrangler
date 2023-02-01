@@ -3,9 +3,10 @@ package jira
 import (
 	"context"
 	"fmt"
-	jira "github.com/andygrunwald/go-jira/v2/onpremise"
 	"net/http"
 	"strings"
+
+	jira "github.com/andygrunwald/go-jira/v2/onpremise"
 )
 
 const (
