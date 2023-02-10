@@ -22,11 +22,11 @@ func main() {
 		Use:  "jira-wrangler",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			ctx, cancel := context.WithCancel(cmd.Root().Context())
+			ctx, cancel := context.WithCancel(cmd.Context())
 			defer cancel()
 
 			if err := opts.LoadSecrets(); err != nil {
-				fmt.Fprintf(os.Stderr, "loading secrets from %q: %v", opts.SecretsPath, err)
+				return fmt.Errorf("loading secrets from %q: %w", opts.SecretsPath, err)
 			}
 
 			tp := jira.BearerAuthTransport{
@@ -60,7 +60,7 @@ func main() {
 			}
 
 			rw, err := cli.NewTemplatedReportWriter(
-				os.Stdout,
+				cmd.OutOrStdout(),
 				cli.WithOverrideTemplatePath(opts.OverrideTemplatesPath),
 			)
 			if err != nil {
@@ -77,17 +77,22 @@ func main() {
 
 	opts.AddFlags(cmd.Flags())
 
+	code := 0
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	defer stop()
+	defer func() {
+		stop()
+
+		os.Exit(code)
+	}()
 
 	if err := cmd.ExecuteContext(ctx); err != nil {
-		os.Exit(1)
+		code = 1
 	}
 }
 
 type JiraClient interface {
 	SearchIssues(ctx context.Context, jql string) ([]jirainternal.Issue, error)
-	GetIssue(ctx context.Context, key string) (jirainternal.Issue, error)
 }
 
 func getIssuesGroupedByColor(ctx context.Context, label string, client JiraClient) ([]jirainternal.Issue, error) {
@@ -103,15 +108,6 @@ func getIssuesGroupedByColor(ctx context.Context, label string, client JiraClien
 	slices.SortStableFunc(issues, func(a, b jirainternal.Issue) bool {
 		return a.Color.Less(b.Color)
 	})
-
-	for idx, issue := range issues {
-		fullIssue, err := client.GetIssue(ctx, issue.Key)
-		if err != nil {
-			return nil, err
-		}
-
-		issues[idx] = fullIssue
-	}
 
 	return issues, nil
 }

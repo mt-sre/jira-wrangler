@@ -34,15 +34,6 @@ type Client struct {
 	c *jira.Client
 }
 
-func (c *Client) GetIssue(ctx context.Context, key string) (Issue, error) {
-	raw, _, err := c.c.Issue.Get(ctx, key, &jira.GetQueryOptions{})
-	if err != nil {
-		return Issue{}, fmt.Errorf("getting issue: %w", err)
-	}
-
-	return issueFromRaw(*raw), nil
-}
-
 func (c *Client) SearchIssues(ctx context.Context, jql string) ([]Issue, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -53,11 +44,25 @@ func (c *Client) SearchIssues(ctx context.Context, jql string) ([]Issue, error) 
 	}
 
 	res := make([]Issue, 0, len(issues))
-	for _, i := range issues {
-		res = append(res, issueFromRaw(i))
+	for _, issue := range issues {
+		i, err := c.getIssue(ctx, issue.Key)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, i)
 	}
 
 	return res, nil
+}
+
+func (c *Client) getIssue(ctx context.Context, key string) (Issue, error) {
+	raw, _, err := c.c.Issue.Get(ctx, key, &jira.GetQueryOptions{})
+	if err != nil {
+		return Issue{}, fmt.Errorf("getting issue: %w", err)
+	}
+
+	return issueFromRaw(*raw), nil
 }
 
 func issueFromRaw(raw jira.Issue) Issue {
