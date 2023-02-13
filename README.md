@@ -48,6 +48,9 @@ Example:
 IMAGE_REGISTRY=quay.io IMAGE_ORG=foobar JIRA_TOKEN=supersecrettoken ./mage test:applydev
 ```
 
+> Note: If you are pushing `jira-wrangler` to a quay repository for the first time
+> image pull may fail until the repository is not made public.
+
 ## License
 
 See [License](LICENSE).
