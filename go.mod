@@ -9,7 +9,7 @@ require (
 	github.com/otiai10/copy v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
 	sigs.k8s.io/yaml v1.3.0
 )
