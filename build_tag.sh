@@ -4,4 +4,4 @@ set -exvo pipefail -o nounset
 
 source "${PWD}/cicd/jenkins_env.sh"
 
-./mage release
+DOCKER_CONFIG="${DOCKER_CONF}" ./mage release
