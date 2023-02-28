@@ -8,4 +8,4 @@ if [ -d  "${GO_1_19}" ]; then
 fi
 
 export IMAGE_REGISTRY="quay.io"
-export IMAGE_ORG="mt-sre"
+export IMAGE_ORG="mtsre"
