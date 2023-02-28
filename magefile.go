@@ -96,6 +96,7 @@ var Aliases = map[string]interface{}{
 	"build":     Build.CLI,
 	"check":     All.Check,
 	"install":   Build.Install,
+	"release":   Release.Full,
 	"run-hooks": Hooks.Run,
 	"test":      All.Test,
 }
